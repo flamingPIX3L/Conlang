@@ -190,7 +190,6 @@
     <div class="word-count" id="wordCount"></div>
     
     <script>
-        // ========== SEARCH FUNCTION ==========
         function addSearch() {
             const searchHTML = `
                 <div style="text-align: center; margin: 20px 0;">
@@ -198,16 +197,13 @@
                            style="padding: 10px; width: 80%; font-size: 16px; border: 2px solid #ccc; border-radius: 5px;">
                 </div>
             `;
-            // Insert search box right after the <h1>
             document.querySelector('h1').insertAdjacentHTML('afterend', searchHTML);
             
-            // Add search functionality
             document.getElementById('searchBox').addEventListener('input', function(e) {
                 const searchTerm = e.target.value.toLowerCase();
                 const allEntries = document.querySelectorAll('.word-entry');
                 const allHeadings = document.querySelectorAll('.letter-heading');
                 
-                // Show/hide entries based on search
                 allEntries.forEach(entry => {
                     const word = entry.getAttribute('data-word').toLowerCase();
                     if (word.includes(searchTerm)) {
@@ -217,10 +213,8 @@
                     }
                 });
                 
-                // Show/hide letter headings based on whether any visible entries under them
                 allHeadings.forEach(heading => {
                     const letter = heading.textContent.toLowerCase();
-                    // Check if any visible entries start with this letter
                     const hasVisibleEntries = Array.from(allEntries).some(entry => {
                         return entry.style.display !== 'none' && 
                                entry.getAttribute('data-word').toLowerCase().startsWith(letter);
@@ -230,7 +224,6 @@
             });
         }
         
-        // ========== LETTER NAVIGATION ==========
         function addLetterNav() {
             const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
             const navHTML = letters.map(letter => 
@@ -243,7 +236,6 @@
                 </div>
             `;
             
-            // Insert navigation after the search box (or after h1 if no search)
             const searchBox = document.getElementById('searchBox');
             if (searchBox) {
                 searchBox.parentNode.insertAdjacentHTML('afterend', navContainer);
@@ -252,29 +244,24 @@
             }
         }
         
-        // ========== SORT FUNCTION (Updated) ==========
         function sortDictionary() {
             const container = document.body;
             const entries = Array.from(document.querySelectorAll('.word-entry'));
             
-            // Remove all entries from the page
             entries.forEach(entry => entry.remove());
             
-            // Sort by the word (case-insensitive)
             entries.sort((a, b) => {
                 const wordA = a.getAttribute('data-word').toLowerCase();
                 const wordB = b.getAttribute('data-word').toLowerCase();
                 return wordA.localeCompare(wordB);
             });
             
-            // Group by first letter and add letter headings
             let currentLetter = '';
             
             entries.forEach(entry => {
                 const word = entry.getAttribute('data-word');
                 const firstLetter = word.charAt(0).toUpperCase();
                 
-                // Add letter heading if needed
                 if (firstLetter !== currentLetter) {
                     currentLetter = firstLetter;
                     const heading = document.createElement('div');
@@ -284,33 +271,25 @@
                     container.appendChild(heading);
                 }
                 
-                // Add the word entry
                 container.appendChild(entry);
             });
             
-            // Update word count
             updateWordCount();
         }
         
-        // ========== WORD COUNTER ==========
         function updateWordCount() {
             const count = document.querySelectorAll('.word-entry').length;
             document.getElementById('wordCount').textContent = `Total words: ${count}`;
             document.title = `Conlang Dictionary (${count} words)`;
         }
         
-        // ========== INITIALIZE EVERYTHING ==========
         document.addEventListener('DOMContentLoaded', function() {
-            // 1. First add search functionality
             addSearch();
             
-            // 2. Then add letter navigation
             addLetterNav();
             
-            // 3. Sort the dictionary
             sortDictionary();
             
-            // 4. Add last updated date (optional)
             const dateElement = document.createElement('div');
             dateElement.style.textAlign = 'center';
             dateElement.style.color = '#666';
@@ -320,7 +299,6 @@
             document.body.appendChild(dateElement);
         });
         
-        // ========== EXPORT FUNCTION (Bonus) ==========
         function exportDictionary() {
             const entries = Array.from(document.querySelectorAll('.word-entry')).map(entry => ({
                 word: entry.getAttribute('data-word'),
@@ -340,8 +318,6 @@
             document.body.removeChild(link);
         }
         
-        // Add export button (optional - uncomment if you want it)
-        /*
         document.addEventListener('DOMContentLoaded', function() {
             const exportBtn = document.createElement('button');
             exportBtn.textContent = 'Export Dictionary as JSON';
