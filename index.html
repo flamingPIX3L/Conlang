@@ -27,6 +27,12 @@
             padding-bottom: 15px;
             border-bottom: 1px solid #eee;
             margin-right: 40px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .word-entry:hover {
+            background-color: #f9f9f9;
         }
         
         .word-header {
@@ -202,6 +208,187 @@
             display: none !important;
         }
         
+        /* ========== WORD POPUP MODAL ========== */
+        .word-popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .word-popup {
+            background: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            animation: slideUp 0.3s ease;
+            position: relative;
+        }
+        
+        .popup-header {
+            background: linear-gradient(135deg, #0066cc, #0099cc);
+            color: white;
+            padding: 20px;
+            border-radius: 12px 12px 0 0;
+            position: relative;
+        }
+        
+        .popup-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            font-size: 1.5em;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+        
+        .popup-close:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        .popup-word {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .popup-ipa {
+            font-family: monospace;
+            font-size: 1.2em;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+        
+        .popup-pos {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+        
+        .popup-content {
+            padding: 25px;
+        }
+        
+        .popup-section {
+            margin-bottom: 20px;
+        }
+        
+        .popup-section-title {
+            font-weight: bold;
+            color: #0066cc;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+        
+        .popup-definition {
+            line-height: 1.6;
+            font-size: 1.05em;
+        }
+        
+        .popup-synonyms {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .synonym-tag {
+            background: #f0f7ff;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 0.9em;
+            color: #0066cc;
+        }
+        
+        .popup-actions {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            padding: 15px;
+            border-top: 1px solid #eee;
+            background: #f9f9f9;
+            border-radius: 0 0 12px 12px;
+        }
+        
+        .popup-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+        
+        .share-btn {
+            background: #4CAF50;
+            color: white;
+        }
+        
+        .share-btn:hover {
+            background: #45a049;
+        }
+        
+        .camera-btn {
+            background: #2196F3;
+            color: white;
+        }
+        
+        .camera-btn:hover {
+            background: #0b7dda;
+        }
+        
+        .copy-btn {
+            background: #FF9800;
+            color: white;
+        }
+        
+        .copy-btn:hover {
+            background: #e68900;
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            from { 
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
         @media (max-width: 900px) {
             body {
                 max-width: 90%;
@@ -229,11 +416,35 @@
             .word-count, .export-btn, .search-info {
                 margin-right: 0;
             }
+            
+            .popup-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .popup-btn {
+                width: 90%;
+                justify-content: center;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .word-popup {
+                width: 95%;
+            }
+            
+            .popup-word {
+                font-size: 1.7em;
+            }
         }
     </style>
 </head>
 <body>
     <h1>Conlang Dictionary</h1>
+    
+    <!-- Word popup will be inserted here -->
+    <div id="wordPopupContainer"></div>
+    
     <div class="word-entry" data-word="vi" data-pos="adjective,prefix" data-definition="(adj.) Having qualities traditionally associated with men or boys; Of or denoting a gender of nouns and adjectives, conventionally regarded as male. (prefix) Masculine gender marker" data-synonyms="masculine,male,manly">
         <div class="word-header">
             Vi <span class="ipa">/fi:/</span> <span class="pos">adjective, prefix</span>
@@ -433,6 +644,166 @@
     <div class="search-info" id="searchInfo"></div>
     
     <script>
+        // ========== POPUP FUNCTIONS ==========
+        
+        function showWordPopup(wordEntry) {
+            const word = wordEntry.getAttribute('data-word');
+            const ipa = wordEntry.querySelector('.ipa').textContent;
+            const pos = wordEntry.querySelector('.pos').textContent;
+            const definition = wordEntry.querySelector('.definition').textContent;
+            const synonyms = wordEntry.getAttribute('data-synonyms') || '';
+            
+            // Update URL with word parameter
+            const newUrl = `${window.location.pathname}?word=${encodeURIComponent(word.toLowerCase())}`;
+            window.history.pushState({word: word}, '', newUrl);
+            
+            // Create popup HTML
+            const popupHTML = `
+                <div class="word-popup-overlay" id="wordPopup">
+                    <div class="word-popup">
+                        <div class="popup-header">
+                            <button class="popup-close" id="popupCloseBtn">&times;</button>
+                            <div class="popup-word">${word}</div>
+                            <div class="popup-ipa">${ipa}</div>
+                            <div class="popup-pos">${pos}</div>
+                        </div>
+                        
+                        <div class="popup-content">
+                            <div class="popup-section">
+                                <div class="popup-section-title">Definition</div>
+                                <div class="popup-definition">${definition}</div>
+                            </div>
+                            
+                            ${synonyms ? `
+                            <div class="popup-section">
+                                <div class="popup-section-title">English Synonyms</div>
+                                <div class="popup-synonyms">
+                                    ${synonyms.split(',').map(syn => 
+                                        `<span class="synonym-tag">${syn.trim()}</span>`
+                                    ).join('')}
+                                </div>
+                            </div>
+                            ` : ''}
+                        </div>
+                        
+                        <div class="popup-actions">
+                            <button class="popup-btn share-btn" id="shareBtn">
+                                <span>🔗</span> Share
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Insert popup into container
+            document.getElementById('wordPopupContainer').innerHTML = popupHTML;
+            
+            // Add event listeners for popup buttons
+            document.getElementById('popupCloseBtn').addEventListener('click', closePopup);
+            document.getElementById('shareBtn').addEventListener('click', () => shareWord(word));
+            document.getElementById('cameraBtn').addEventListener('click', () => captureWordPopup(word));
+            document.getElementById('copyBtn').addEventListener('click', () => copyWordDetails(word, ipa, pos, definition, synonyms));
+            
+            // Also close popup when clicking outside
+            document.getElementById('wordPopup').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closePopup();
+                }
+            });
+            
+            // Prevent body scrolling when popup is open
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closePopup() {
+            // Remove popup
+            document.getElementById('wordPopupContainer').innerHTML = '';
+            
+            // Update URL to remove word parameter
+            const newUrl = window.location.pathname;
+            window.history.pushState({}, '', newUrl);
+            
+            // Restore body scrolling
+            document.body.style.overflow = 'auto';
+        }
+        
+        function shareWord(word) {
+            const url = `${window.location.origin}${window.location.pathname}?word=${encodeURIComponent(word.toLowerCase())}`;
+            const text = `Check out the word "${word}" in the Conlang Dictionary!`;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: `Conlang Dictionary - ${word}`,
+                    text: text,
+                    url: url,
+                });
+            } else {
+                // Fallback: copy to clipboard
+                navigator.clipboard.writeText(`${text}\n${url}`).then(() => {
+                    alert('Link copied to clipboard!');
+                });
+            }
+        }
+        
+        function captureWordPopup(word) {
+            // We'll use html2canvas library for this, but for simplicity, we'll provide a download link
+            // In a real implementation, you would include html2canvas library
+            alert('In a full implementation, this would capture the popup as an image. For now, you can use browser screenshot tools (Ctrl+Shift+S on Windows/Linux, Cmd+Shift+4 on Mac).');
+            
+            // For a real implementation with html2canvas:
+            /*
+            html2canvas(document.querySelector('.word-popup')).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `conlang-${word}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
+            */
+        }
+        
+        function copyWordDetails(word, ipa, pos, definition, synonyms) {
+            const textToCopy = `
+${word} ${ipa}
+Part of speech: ${pos}
+
+Definition:
+${definition}
+
+${synonyms ? `Synonyms: ${synonyms}` : ''}
+---
+From Conlang Dictionary
+            `.trim();
+            
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                // Show temporary feedback
+                const copyBtn = document.getElementById('copyBtn');
+                const originalText = copyBtn.innerHTML;
+                copyBtn.innerHTML = '<span>✓</span> Copied!';
+                copyBtn.style.background = '#4CAF50';
+                
+                setTimeout(() => {
+                    copyBtn.innerHTML = originalText;
+                    copyBtn.style.background = '';
+                }, 2000);
+            });
+        }
+        
+        // Check URL for word parameter on page load
+        function checkUrlForWord() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const wordParam = urlParams.get('word');
+            
+            if (wordParam) {
+                // Find the word entry and show its popup
+                const wordEntry = document.querySelector(`.word-entry[data-word="${wordParam.toLowerCase()}"]`);
+                if (wordEntry) {
+                    // Small delay to ensure page is loaded
+                    setTimeout(() => showWordPopup(wordEntry), 100);
+                }
+            }
+        }
+        
+        // ========== EXISTING FUNCTIONS ==========
         
         function addVerticalLetterNav() {
             const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
@@ -472,7 +843,6 @@
                 }
             });
         }
-        
         
         function addFilterControls() {
             const filterHTML = `
@@ -538,7 +908,6 @@
             document.getElementById('showCounts').addEventListener('change', updateSearchInfo);
             document.getElementById('resetFilters').addEventListener('click', resetFilters);
         }
-        
         
         function applyFilters() {
             const searchTerm = document.getElementById('searchBox').value.toLowerCase();
@@ -646,7 +1015,6 @@
             applyFilters();
         }
         
-        
         function exportDictionary() {
             const entries = Array.from(document.querySelectorAll('.word-entry')).map(entry => ({
                 word: entry.getAttribute('data-word'),
@@ -666,7 +1034,6 @@
             link.click();
             document.body.removeChild(link);
         }
-        
         
         function sortDictionary() {
             const container = document.body;
@@ -711,12 +1078,25 @@
             document.title = `Conlang Dictionary (${count} words)`;
         }
         
-     
+        // ========== INITIALIZATION ==========
         
         document.addEventListener('DOMContentLoaded', function() {
             addVerticalLetterNav();
             addFilterControls();
             sortDictionary();
+            
+            // Add click handlers to word entries
+            document.querySelectorAll('.word-entry').forEach(entry => {
+                entry.addEventListener('click', () => showWordPopup(entry));
+            });
+            
+            // Check URL for word parameter
+            checkUrlForWord();
+            
+            // Handle browser back/forward buttons
+            window.addEventListener('popstate', function(event) {
+                checkUrlForWord();
+            });
             
             const exportBtn = document.createElement('button');
             exportBtn.className = 'export-btn';
