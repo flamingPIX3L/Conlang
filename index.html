@@ -71,10 +71,50 @@
             font-size: 0.9em;
             font-style: italic;
         }
+        
+        /* New styles for search and navigation */
+        #searchBox {
+            padding: 10px;
+            width: 80%;
+            font-size: 16px;
+            margin: 20px auto;
+            display: block;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+        }
+        
+        .letter-nav {
+            text-align: center;
+            margin: 10px 0;
+            padding: 10px;
+            background: #f5f5f5;
+            border-radius: 5px;
+        }
+        
+        .letter-nav a {
+            margin: 0 5px;
+            text-decoration: none;
+            color: #0066cc;
+            font-weight: bold;
+        }
+        
+        .letter-nav a:hover {
+            text-decoration: underline;
+        }
+        
+        .word-count {
+            text-align: center;
+            color: #666;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
     <h1>Conlang Dictionary</h1>
+    
+    <!-- Search box will appear here automatically -->
+    <!-- Letter navigation will appear here automatically -->
     
     <div class="word-entry" data-word="ben">
         <div class="word-header">
@@ -147,8 +187,72 @@
         </audio>
     </div>
     
+    <div class="word-count" id="wordCount"></div>
+    
     <script>
-        // Automatically sort entries alphabetically
+        // ========== SEARCH FUNCTION ==========
+        function addSearch() {
+            const searchHTML = `
+                <div style="text-align: center; margin: 20px 0;">
+                    <input type="text" id="searchBox" placeholder="Type to search words..." 
+                           style="padding: 10px; width: 80%; font-size: 16px; border: 2px solid #ccc; border-radius: 5px;">
+                </div>
+            `;
+            // Insert search box right after the <h1>
+            document.querySelector('h1').insertAdjacentHTML('afterend', searchHTML);
+            
+            // Add search functionality
+            document.getElementById('searchBox').addEventListener('input', function(e) {
+                const searchTerm = e.target.value.toLowerCase();
+                const allEntries = document.querySelectorAll('.word-entry');
+                const allHeadings = document.querySelectorAll('.letter-heading');
+                
+                // Show/hide entries based on search
+                allEntries.forEach(entry => {
+                    const word = entry.getAttribute('data-word').toLowerCase();
+                    if (word.includes(searchTerm)) {
+                        entry.style.display = 'block';
+                    } else {
+                        entry.style.display = 'none';
+                    }
+                });
+                
+                // Show/hide letter headings based on whether any visible entries under them
+                allHeadings.forEach(heading => {
+                    const letter = heading.textContent.toLowerCase();
+                    // Check if any visible entries start with this letter
+                    const hasVisibleEntries = Array.from(allEntries).some(entry => {
+                        return entry.style.display !== 'none' && 
+                               entry.getAttribute('data-word').toLowerCase().startsWith(letter);
+                    });
+                    heading.style.display = hasVisibleEntries ? 'block' : 'none';
+                });
+            });
+        }
+        
+        // ========== LETTER NAVIGATION ==========
+        function addLetterNav() {
+            const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+            const navHTML = letters.map(letter => 
+                `<a href="#letter-${letter}" style="margin: 0 5px; text-decoration: none; color: #0066cc; font-weight: bold;">${letter}</a>`
+            ).join('');
+            
+            const navContainer = `
+                <div class="letter-nav">
+                    ${navHTML}
+                </div>
+            `;
+            
+            // Insert navigation after the search box (or after h1 if no search)
+            const searchBox = document.getElementById('searchBox');
+            if (searchBox) {
+                searchBox.parentNode.insertAdjacentHTML('afterend', navContainer);
+            } else {
+                document.querySelector('h1').insertAdjacentHTML('afterend', navContainer);
+            }
+        }
+        
+        // ========== SORT FUNCTION (Updated) ==========
         function sortDictionary() {
             const container = document.body;
             const entries = Array.from(document.querySelectorAll('.word-entry'));
@@ -175,6 +279,7 @@
                     currentLetter = firstLetter;
                     const heading = document.createElement('div');
                     heading.className = 'letter-heading';
+                    heading.id = `letter-${currentLetter}`;
                     heading.textContent = currentLetter;
                     container.appendChild(heading);
                 }
@@ -182,54 +287,69 @@
                 // Add the word entry
                 container.appendChild(entry);
             });
-        }
-        // Add this after your sortDictionary function
-        function addSearch() {
-            const html = `
-                <div style="margin: 20px 0; text-align: center;">
-                    <input type="text" id="searchBox" placeholder="Search words..." 
-                           style="padding: 10px; width: 80%; font-size: 16px;">
-                </div>
-            `;
-            document.body.insertAdjacentHTML('afterbegin', html);
             
-            document.getElementById('searchBox').addEventListener('input', (e) => {
-                const searchTerm = e.target.value.toLowerCase();
-                document.querySelectorAll('.word-entry').forEach(entry => {
-                    const word = entry.getAttribute('data-word').toLowerCase();
-                    entry.style.display = word.includes(searchTerm) ? 'block' : 'none';
-                });
-            });
+            // Update word count
+            updateWordCount();
         }
-        // Call it: addSearch();
-        function addLetterNav() {
-            const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
-            const nav = letters.map(l => `<a href="#letter-${l}" style="margin: 0 5px;">${l}</a>`).join('');
-            document.body.insertAdjacentHTML('afterbegin', 
-                `<div style="text-align: center; margin: 10px 0; padding: 10px; background: #f5f5f5;">${nav}</div>`);
-        }
-        const count = document.querySelectorAll('.word-entry').length;
-        document.title = `Conlang Dictionary (${count} words)`;
-        // Sort when page loads
-        document.addEventListener('DOMContentLoaded', sortDictionary);
         
-        // Simple instructions for adding new words
-        console.log(`
-HOW TO ADD NEW WORDS:
-1. Copy and paste one of the word-entry divs
-2. Change the data-word attribute to your new word
-3. Update the IPA, part of speech, and definition
-4. For audio: 
-   - Record word as MP3
-   - Save as wordname.mp3 in same folder
-   - Replace <div class="no-audio"> with <audio> tag
-   Example:
-   <audio controls>
-       <source src="wordname.mp3" type="audio/mpeg">
-   </audio>
-   
-The page will automatically sort alphabetically on refresh!
-        `);
+        // ========== WORD COUNTER ==========
+        function updateWordCount() {
+            const count = document.querySelectorAll('.word-entry').length;
+            document.getElementById('wordCount').textContent = `Total words: ${count}`;
+            document.title = `Conlang Dictionary (${count} words)`;
+        }
+        
+        // ========== INITIALIZE EVERYTHING ==========
+        document.addEventListener('DOMContentLoaded', function() {
+            // 1. First add search functionality
+            addSearch();
+            
+            // 2. Then add letter navigation
+            addLetterNav();
+            
+            // 3. Sort the dictionary
+            sortDictionary();
+            
+            // 4. Add last updated date (optional)
+            const dateElement = document.createElement('div');
+            dateElement.style.textAlign = 'center';
+            dateElement.style.color = '#666';
+            dateElement.style.fontSize = '0.9em';
+            dateElement.style.marginTop = '20px';
+            dateElement.textContent = `Last updated: ${new Date().toLocaleDateString()}`;
+            document.body.appendChild(dateElement);
+        });
+        
+        // ========== EXPORT FUNCTION (Bonus) ==========
+        function exportDictionary() {
+            const entries = Array.from(document.querySelectorAll('.word-entry')).map(entry => ({
+                word: entry.getAttribute('data-word'),
+                ipa: entry.querySelector('.ipa').textContent,
+                pos: entry.querySelector('.pos').textContent,
+                definition: entry.querySelector('.definition').textContent
+            }));
+            
+            const dataStr = JSON.stringify(entries, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+            
+            const link = document.createElement('a');
+            link.href = dataUri;
+            link.download = 'conlang-dictionary.json';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+        
+        // Add export button (optional - uncomment if you want it)
+        /*
+        document.addEventListener('DOMContentLoaded', function() {
+            const exportBtn = document.createElement('button');
+            exportBtn.textContent = 'Export Dictionary as JSON';
+            exportBtn.style.cssText = 'display: block; margin: 20px auto; padding: 10px; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer;';
+            exportBtn.onclick = exportDictionary;
+            document.querySelector('.word-count').insertAdjacentHTML('beforebegin', exportBtn.outerHTML);
+        });
+        */
     </script>
 </body>
 </html>
