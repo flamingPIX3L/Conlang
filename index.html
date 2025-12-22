@@ -183,7 +183,33 @@
                 container.appendChild(entry);
             });
         }
-        
+        // Add this after your sortDictionary function
+        function addSearch() {
+            const html = `
+                <div style="margin: 20px 0; text-align: center;">
+                    <input type="text" id="searchBox" placeholder="Search words..." 
+                           style="padding: 10px; width: 80%; font-size: 16px;">
+                </div>
+            `;
+            document.body.insertAdjacentHTML('afterbegin', html);
+            
+            document.getElementById('searchBox').addEventListener('input', (e) => {
+                const searchTerm = e.target.value.toLowerCase();
+                document.querySelectorAll('.word-entry').forEach(entry => {
+                    const word = entry.getAttribute('data-word').toLowerCase();
+                    entry.style.display = word.includes(searchTerm) ? 'block' : 'none';
+                });
+            });
+        }
+        // Call it: addSearch();
+        function addLetterNav() {
+            const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+            const nav = letters.map(l => `<a href="#letter-${l}" style="margin: 0 5px;">${l}</a>`).join('');
+            document.body.insertAdjacentHTML('afterbegin', 
+                `<div style="text-align: center; margin: 10px 0; padding: 10px; background: #f5f5f5;">${nav}</div>`);
+        }
+        const count = document.querySelectorAll('.word-entry').length;
+        document.title = `Conlang Dictionary (${count} words)`;
         // Sort when page loads
         document.addEventListener('DOMContentLoaded', sortDictionary);
         
