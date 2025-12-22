@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Conlang Dictionary</title>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            line-height: 1.6;
+            color: black;
+            background: white;
+        }
+        
+        h1 {
+            text-align: center;
+            border-bottom: 2px solid #ccc;
+            padding-bottom: 10px;
+        }
+        
+        .word-entry {
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .word-header {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .ipa {
+            color: #666;
+            font-family: monospace;
+            margin-left: 10px;
+        }
+        
+        .pos {
+            display: inline-block;
+            background: #f0f0f0;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-size: 0.9em;
+            margin-left: 10px;
+        }
+        
+        .definition {
+            margin: 8px 0;
+        }
+        
+        audio {
+            margin-top: 5px;
+            width: 250px;
+            height: 30px;
+        }
+        
+        .letter-heading {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #333;
+            margin-top: 20px;
+            padding-top: 10px;
+            border-top: 2px solid #ccc;
+        }
+        
+        .no-audio {
+            color: #999;
+            font-size: 0.9em;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <h1>Conlang Dictionary</h1>
+    
+    <!-- Your dictionary entries go here -->
+    <!-- Format: 
+    <div class="word-entry" data-word="WORD">
+        <div class="word-header">
+            WORD <span class="ipa">/IPA/</span> <span class="pos">part-of-speech</span>
+        </div>
+        <div class="definition">Definition goes here.</div>
+        <audio controls>
+            <source src="WORD.mp3" type="audio/mpeg">
+            Your browser does not support the audio element.
+        </audio>
+    </div>
+    -->
+    
+    <!-- EXAMPLE ENTRIES - REPLACE/ADD TO THESE -->
+    <div class="word-entry" data-word="Viben">
+        <div class="word-header">
+            Ben <span class="ipa">/bɛn/</span> <span class="pos">noun, suffix</span>
+        </div>
+        <div class="definition">(n.) A human being; A character with personified traits</br>(suffix) Marks a person or character</div>
+        <audio controls>
+            <source src="viben.mp3" type="audio/mpeg">
+            Your browser does not support the audio element.
+        </audio>
+    </div>
+    <!-- END EXAMPLE ENTRIES -->
+    
+    <script>
+        // Automatically sort entries alphabetically
+        function sortDictionary() {
+            const container = document.body;
+            const entries = Array.from(document.querySelectorAll('.word-entry'));
+            
+            // Remove all entries from the page
+            entries.forEach(entry => entry.remove());
+            
+            // Sort by the word (case-insensitive)
+            entries.sort((a, b) => {
+                const wordA = a.getAttribute('data-word').toLowerCase();
+                const wordB = b.getAttribute('data-word').toLowerCase();
+                return wordA.localeCompare(wordB);
+            });
+            
+            // Group by first letter and add letter headings
+            let currentLetter = '';
+            
+            entries.forEach(entry => {
+                const word = entry.getAttribute('data-word');
+                const firstLetter = word.charAt(0).toUpperCase();
+                
+                // Add letter heading if needed
+                if (firstLetter !== currentLetter) {
+                    currentLetter = firstLetter;
+                    const heading = document.createElement('div');
+                    heading.className = 'letter-heading';
+                    heading.textContent = currentLetter;
+                    container.appendChild(heading);
+                }
+                
+                // Add the word entry
+                container.appendChild(entry);
+            });
+        }
+        
+        // Sort when page loads
+        document.addEventListener('DOMContentLoaded', sortDictionary);
+        
+        // Simple instructions for adding new words
+        console.log(`
+HOW TO ADD NEW WORDS:
+1. Copy and paste one of the word-entry divs
+2. Change the data-word attribute to your new word
+3. Update the IPA, part of speech, and definition
+4. For audio: 
+   - Record word as MP3
+   - Save as wordname.mp3 in same folder
+   - Replace <div class="no-audio"> with <audio> tag
+   Example:
+   <audio controls>
+       <source src="wordname.mp3" type="audio/mpeg">
+   </audio>
+   
+The page will automatically sort alphabetically on refresh!
+        `);
+    </script>
+</body>
+</html>
