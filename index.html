@@ -22,6 +22,104 @@
             margin-right: 40px;
         }
         
+        /* ========== MORE BUTTON ========== */
+        .more-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #0066cc;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            z-index: 2001;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: background 0.2s;
+        }
+        
+        .more-button:hover {
+            background: #0055aa;
+        }
+        
+        /* ========== MORE POPUP ========== */
+        .more-popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2002;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .more-popup {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            animation: slideUp 0.3s ease;
+            min-width: 250px;
+            text-align: center;
+        }
+        
+        .more-popup h2 {
+            margin-top: 0;
+            margin-bottom: 20px;
+            color: #0066cc;
+        }
+        
+        .more-popup-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .more-popup-btn {
+            padding: 12px 20px;
+            background: #f0f7ff;
+            color: #0066cc;
+            border: 2px solid #0066cc;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            transition: all 0.2s;
+            text-decoration: none;
+            text-align: center;
+        }
+        
+        .more-popup-btn:hover {
+            background: #0066cc;
+            color: white;
+        }
+        
+        .popup-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .popup-close:hover {
+            background: #f0f0f0;
+        }
+        
         .word-entry {
             margin-bottom: 25px;
             padding-bottom: 15px;
@@ -417,6 +515,14 @@
                 margin-right: 0;
             }
             
+            .more-button {
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                padding: 8px 15px;
+                font-size: 14px;
+            }
+            
             .popup-actions {
                 flex-direction: column;
                 align-items: center;
@@ -436,10 +542,21 @@
             .popup-word {
                 font-size: 1.7em;
             }
+            
+            .more-popup {
+                width: 90%;
+                padding: 20px;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- More Button -->
+    <button class="more-button" id="moreButton">More</button>
+    
+    <!-- More Popup -->
+    <div id="morePopupContainer"></div>
+    
     <h1>Conlang Dictionary</h1>
     
     <!-- Word popup will be inserted here -->
@@ -644,7 +761,47 @@
     <div class="search-info" id="searchInfo"></div>
     
     <script>
-        // ========== POPUP FUNCTIONS ==========
+        // ========== MORE POPUP FUNCTIONS ==========
+        
+        function showMorePopup() {
+            const popupHTML = `
+                <div class="more-popup-overlay" id="morePopup">
+                    <div class="more-popup">
+                        <button class="popup-close" id="morePopupCloseBtn">&times;</button>
+                        <h2>More Resources</h2>
+                        <div class="more-popup-buttons">
+                            <a href="grammar_rules.html" class="more-popup-btn">Grammar Rules</a>
+                            <a href="phonology.html" class="more-popup-btn">Phonology</a>
+                            <a href="community.html" class="more-popup-btn">Community</a>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Insert popup into container
+            document.getElementById('morePopupContainer').innerHTML = popupHTML;
+            
+            // Add event listeners
+            document.getElementById('morePopupCloseBtn').addEventListener('click', closeMorePopup);
+            document.getElementById('morePopup').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeMorePopup();
+                }
+            });
+            
+            // Prevent body scrolling when popup is open
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeMorePopup() {
+            // Remove popup
+            document.getElementById('morePopupContainer').innerHTML = '';
+            
+            // Restore body scrolling
+            document.body.style.overflow = 'auto';
+        }
+        
+        // ========== WORD POPUP FUNCTIONS ==========
         
         function showWordPopup(wordEntry) {
             const word = wordEntry.getAttribute('data-word');
@@ -746,19 +903,7 @@
         }
         
         function captureWordPopup(word) {
-            // We'll use html2canvas library for this, but for simplicity, we'll provide a download link
-            // In a real implementation, you would include html2canvas library
             alert('In a full implementation, this would capture the popup as an image. For now, you can use browser screenshot tools (Ctrl+Shift+S on Windows/Linux, Cmd+Shift+4 on Mac).');
-            
-            // For a real implementation with html2canvas:
-            /*
-            html2canvas(document.querySelector('.word-popup')).then(canvas => {
-                const link = document.createElement('a');
-                link.download = `conlang-${word}.png`;
-                link.href = canvas.toDataURL('image/png');
-                link.click();
-            });
-            */
         }
         
         function copyWordDetails(word, ipa, pos, definition, synonyms) {
@@ -1081,6 +1226,9 @@ From Conlang Dictionary
         // ========== INITIALIZATION ==========
         
         document.addEventListener('DOMContentLoaded', function() {
+            // Add event listener to More button
+            document.getElementById('moreButton').addEventListener('click', showMorePopup);
+            
             addVerticalLetterNav();
             addFilterControls();
             sortDictionary();
